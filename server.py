@@ -38,12 +38,20 @@ DEBUG_MODE = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes")
 app = FastAPI(title="Santa Daily Win Universe API", debug=DEBUG_MODE)
 
 # Import and include modular routers from the routes package
-from routes import auth_router, users_router, payments_router, admin_router
+from routes import (
+    auth_router, users_router, payments_router, admin_router,
+    groups_router, transactions_router, shuffle_router, winners_router, jackpot_router
+)
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(payments_router, prefix="/api")
 app.include_router(admin_router, prefix="/api")
+app.include_router(groups_router, prefix="/api")
+app.include_router(transactions_router, prefix="/api")
+app.include_router(shuffle_router, prefix="/api")
+app.include_router(winners_router, prefix="/api")
+app.include_router(jackpot_router, prefix="/api")
 
 # Configure logging
 logging.basicConfig(
