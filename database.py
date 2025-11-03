@@ -1,29 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-import os
-from dotenv import load_dotenv
+"""Compatibility shim: re-export db.database symbols from the `db` package.
 
-load_dotenv()
+This file remains at the repository root for backward compatibility with
+scripts that import `database`. New code should import from `db.database`.
+"""
 
-MONGO_URL = os.environ.get('MONGO_URL')
-DB_NAME = os.environ.get('DB_NAME', 'santa_db')
+from db.database import engine, SessionLocal, get_db  # re-export
 
-# For SQLite (development/local)
-# NOTE: For Emergent deployment, this needs to be migrated to MongoDB
-# as Emergent platform only provides managed MongoDB
-DATABASE_URL = "sqlite:///./santa_gambling.db"
-
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False}  # Needed for SQLite
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-def get_db():
-    """Get database session."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+__all__ = ["engine", "SessionLocal", "get_db"]

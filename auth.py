@@ -7,8 +7,9 @@ from sqlalchemy.orm import Session
 import os
 from typing import Optional
 
-from models import User
-from database import get_db
+from db.models import User
+from db.database import get_db
+from fastapi import HTTPException, status
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -71,3 +72,14 @@ async def get_current_user(
         raise credentials_exception
     
     return user
+
+
+def require_admin(current_user: User = Depends(get_current_user)) -> User:
+    """Dependency to require admin privileges for a route."""
+    # current_user is SQLAlchemy User instance
+    if not getattr(current_user, "is_admin", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator privileges required",
+        )
+    return current_user

@@ -3,7 +3,7 @@ from sqlalchemy import func, and_
 from datetime import datetime, date
 from typing import Dict
 
-from models import User, Deposit, Withdrawal, Transaction, ShuffleParticipant, Winner
+from db.models import User, Deposit, Withdrawal, Transaction, ShuffleParticipant, Winner
 from schemas import BalanceResponse
 
 def calculate_user_balance(user_id: int, db: Session) -> BalanceResponse:

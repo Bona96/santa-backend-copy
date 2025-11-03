@@ -1,0 +1,3 @@
+# Ignore local environment files and SQLite DB
+.env
+santa_gambling.db

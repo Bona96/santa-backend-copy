@@ -23,6 +23,7 @@ class UserResponse(BaseModel):
     age: int
     phone_number: Optional[str] = None
     profile_picture: Optional[str] = None
+    is_admin: bool = False
     balance: float = 0.0
     total_won: float = 0.0
     participations: int = 0
@@ -48,6 +49,7 @@ class DepositResponse(BaseModel):
     currency: str
     status: str
     payment_url: str
+    tx_ref: Optional[str] = None
     
     class Config:
         from_attributes = True
