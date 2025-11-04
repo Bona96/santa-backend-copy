@@ -98,7 +98,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        os.getenv("FRONTEND_URL", "http://localhost:3000"),
+        os.getenv("FRONTEND_URL"),
         "https://*.emergent.host",  # Production domain pattern
         "*"  # Allow all origins for development (remove in strict production)
     ],
