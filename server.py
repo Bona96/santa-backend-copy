@@ -94,17 +94,50 @@ async def root():
 # Note: individual routers are included above from the `routes` package.
 
 # Enable CORS for frontend communication
+# ... (rest of your imports and app setup)
+
+# Build a safe list of allowed origins. Read environment values and support a
+# comma-separated list via FRONTEND_URLS. Never include a wildcard "*" when
+# allow_credentials=True (browsers will reject it and starlette raises errors).
+frontend_url = os.getenv("FRONTEND_URL", "").strip()
+frontend_urls = os.getenv("FRONTEND_URLS", "").strip()
+
+# Start with local dev origins
+allowed_origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
+if frontend_urls:
+    for o in frontend_urls.split(","):
+        if o and o.strip():
+            allowed_origins.append(o.strip())
+
+# Deduplicate and remove empty entries
+allowed_origins = [o for o in dict.fromkeys(allowed_origins) if o]
+
+# If you need wildcard subdomain support (e.g. https://*.emergent.host), use
+# allow_origin_regex instead of include a literal string with a star in
+# allow_origins. Example:
+#   allow_origin_regex = r"https://.*\.emergent\.host"
+# For most deployments it's safer to enumerate exact production origins.
+
+# Only one CORSMiddleware should be added. Keep configuration explicit and
+# strict when allow_credentials is True.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        os.getenv("FRONTEND_URL"),
-        "https://*.emergent.host",  # Production domain pattern
-        "*"  # Allow all origins for development (remove in strict production)
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=allowed_origins,
+    # If you need wildcard subdomains use allow_origin_regex instead of listing
+    # them in allow_origins (see comment above).
+    allow_credentials=True,  # Set to True only when frontend uses cookies or other credentials
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    # Restrict headers to common ones used by the API. Using ["*"] is allowed
+    # when origins are explicit, but listing common headers is clearer.
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With", "X-CSRF-Token"],
+    max_age=600,  # Cache preflight response for 10 minutes
 )
 
 @app.on_event("shutdown")
